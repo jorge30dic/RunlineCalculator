@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Calculadora Handicap -1</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f9f9f9;
+      padding: 20px;
+      margin: 0;
+    }
+
+    .container {
+      max-width: 480px;
+      margin: auto;
+      background: #fff;
+      padding: 25px 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #2c3e50;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-sizing: border-box;
+      font-size: 15px;
+    }
+
+    .radio-group {
+      margin-top: 20px;
+    }
+
+    .radio-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: normal;
+      color: #444;
+    }
+
+    .radio-group input[type="radio"] {
+      margin-right: 8px;
+    }
+
+    button {
+      width: 100%;
+      background-color: #2c3e50;
+      color: white;
+      border: none;
+      padding: 12px;
+      font-size: 16px;
+      margin-top: 25px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #1a252f;
+    }
+
+    .result {
+      margin-top: 25px;
+      background: #eef2f3;
+      padding: 18px;
+      border-left: 6px solid #2c3e50;
+      border-radius: 6px;
+      color: #333;
+    }
+
+    .result strong {
+      color: #2c3e50;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Calculadora Handicap -1</h2>
+
+    <label for="ml">Cuota Moneyline (ML):</label>
+    <input type="number" id="ml" step="0.01" placeholder="Ej: 1.50">
+
+    <label for="rl">Cuota Run Line -1.5:</label>
+    <input type="number" id="rl" step="0.01" placeholder="Ej: 2.30">
+
+    <div class="radio-group">
+      <label>
+        <input type="radio" name="modo" value="ganancia" checked onchange="cambiarModo()">
+        Ganar una cantidad específica
+      </label>
+      <label>
+        <input type="radio" name="modo" value="inversion" onchange="cambiarModo()">
+        Apostar un monto específico
+      </label>
+    </div>
+
+    <div id="campoGanancia">
+      <label for="ganancia">Ganancia deseada ($):</label>
+      <input type="number" id="ganancia" step="0.01" placeholder="Ej: 100">
+    </div>
+
+    <div id="campoInversion" style="display: none;">
+      <label for="inversion">Monto total a apostar ($):</label>
+      <input type="number" id="inversion" step="0.01" placeholder="Ej: 100">
+    </div>
+
+    <button onclick="calcular()">Calcular</button>
+
+    <div class="result" id="resultado"></div>
+  </div>
+
+  <script>
+    function cambiarModo() {
+      const modo = document.querySelector('input[name="modo"]:checked').value;
+      document.getElementById("campoGanancia").style.display = modo === "ganancia" ? "block" : "none";
+      document.getElementById("campoInversion").style.display = modo === "inversion" ? "block" : "none";
+      document.getElementById("resultado").innerHTML = "";
+    }
+
+    function calcular() {
+      const ml = parseFloat(document.getElementById("ml").value);
+      const rl = parseFloat(document.getElementById("rl").value);
+      const modo = document.querySelector('input[name="modo"]:checked').value;
+      const resultado = document.getElementById("resultado");
+
+      if (ml <= 1 || rl <= 1 || isNaN(ml) || isNaN(rl)) {
+        resultado.innerHTML = "Por favor, ingresa cuotas válidas.";
+        return;
+      }
+
+      let x, y, total, ganancia;
+
+      if (modo === "ganancia") {
+        ganancia = parseFloat(document.getElementById("ganancia").value);
+        if (ganancia <= 0 || isNaN(ganancia)) {
+          resultado.innerHTML = "Por favor, ingresa una ganancia válida.";
+          return;
+        }
+        x = ganancia / ((ml - 1) * rl);
+        y = x * (ml - 1);
+        total = x + y;
+        resultado.innerHTML = `
+          <strong>Resultado:</strong><br>
+          Apuesta a <strong>ML @${ml}:</strong> $${x.toFixed(2)}<br>
+          Apuesta a <strong>RL -1.5 @${rl}:</strong> $${y.toFixed(2)}<br>
+          <strong>Total a apostar:</strong> $${total.toFixed(2)}<br><br>
+          Si gana por 1 carrera → Push<br>
+          Si gana por 2+ carreras → Ganas $${ganancia.toFixed(2)}<br>
+          Si pierde → Pierdes todo
+        `;
+      } else {
+        const inversion = parseFloat(document.getElementById("inversion").value);
+        if (inversion <= 0 || isNaN(inversion)) {
+          resultado.innerHTML = "Por favor, ingresa una inversión válida.";
+          return;
+        }
+        const proporción = (ml - 1) / ((ml - 1) + rl);
+        y = inversion * proporción;
+        x = inversion - y;
+        const ganancia2 = (x * ml + y * rl) - inversion;
+
+        resultado.innerHTML = `
+          <strong>Resultado:</strong><br>
+          Apuesta a <strong>ML @${ml}:</strong> $${x.toFixed(2)}<br>
+          Apuesta a <strong>RL -1.5 @${rl}:</strong> $${y.toFixed(2)}<br>
+          <strong>Total apostado:</strong> $${inversion.toFixed(2)}<br><br>
+          Si gana por 1 carrera → Recuperas inversión<br>
+          Si gana por 2+ carreras → Ganancia neta aprox: $${ganancia2.toFixed(2)}<br>
+          Si pierde → Pierdes todo
+        `;
+      }
+    }
+  </script>
+
+</body>
+</html>
