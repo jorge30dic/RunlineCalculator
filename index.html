@@ -12,7 +12,6 @@
       margin: 0;
       padding: 20px;
     }
-
     .container {
       max-width: 540px;
       margin: auto;
@@ -22,19 +21,16 @@
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
       overflow: hidden;
     }
-
     h2 {
       text-align: center;
       color: #2c3e50;
       margin-bottom: 20px;
     }
-
     .tabs {
       display: flex;
       justify-content: center;
       margin-bottom: 20px;
     }
-
     .tab {
       flex: 1;
       text-align: center;
@@ -51,33 +47,28 @@
       justify-content: center;
       gap: 8px;
     }
-
     .tab.active {
       background-color: #fff;
       color: #2c3e50;
       border-bottom: 3px solid white;
     }
-
     .tab-content {
       display: none;
       opacity: 0;
       transform: translateY(20px);
       transition: opacity 0.4s ease, transform 0.4s ease;
     }
-
     .tab-content.active {
       display: block;
       opacity: 1;
       transform: translateY(0);
     }
-
     label {
       display: block;
       margin-top: 15px;
       font-weight: bold;
       color: #333;
     }
-
     input[type="number"] {
       width: 100%;
       padding: 10px;
@@ -86,17 +77,22 @@
       border-radius: 6px;
       font-size: 15px;
     }
-
+    select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 15px;
+    }
     .radio-group {
       margin-top: 15px;
     }
-
     .radio-group label {
       display: block;
       font-weight: normal;
       margin-bottom: 5px;
     }
-
     button {
       width: 100%;
       background-color: #2c3e50;
@@ -108,11 +104,9 @@
       border-radius: 6px;
       cursor: pointer;
     }
-
     button:hover {
       background-color: #1a252f;
     }
-
     .result {
       margin-top: 20px;
       background: #f4f7f9;
@@ -138,6 +132,12 @@
 
   <!-- Tab 1 -->
   <div class="tab-content active">
+    <label for="tipoCuota">Tipo de cuota:</label>
+    <select id="tipoCuota">
+      <option value="decimal" selected>Decimal (Ej: 1.80)</option>
+      <option value="americana">Americana (Ej: -120 / +150)</option>
+    </select>
+
     <label for="ml">Cuota Moneyline (ML):</label>
     <input type="number" id="ml" step="0.01" placeholder="Ej: 1.50">
 
@@ -166,6 +166,12 @@
 
   <!-- Tab 2 -->
   <div class="tab-content">
+    <label for="tipoCuotaSimple">Tipo de cuota:</label>
+    <select id="tipoCuotaSimple">
+      <option value="decimal" selected>Decimal</option>
+      <option value="americana">Americana</option>
+    </select>
+
     <label for="cuotaSimple">Cuota:</label>
     <input type="number" id="cuotaSimple" step="0.01" placeholder="Ej: 1.85">
 
@@ -196,13 +202,29 @@
     document.getElementById("resultado").innerHTML = "";
   }
 
+  function convertirAmericanaADecimal(cuota) {
+    if (cuota >= 100) {
+      return (cuota / 100) + 1;
+    } else if (cuota <= -100) {
+      return (100 / Math.abs(cuota)) + 1;
+    } else {
+      return null;
+    }
+  }
+
   function calcular() {
-    const ml = parseFloat(document.getElementById("ml").value);
-    const rl = parseFloat(document.getElementById("rl").value);
+    let ml = parseFloat(document.getElementById("ml").value);
+    let rl = parseFloat(document.getElementById("rl").value);
+    const tipoCuota = document.getElementById("tipoCuota").value;
     const modo = document.querySelector('input[name="modo"]:checked').value;
     const resultado = document.getElementById("resultado");
 
-    if (ml <= 1 || rl <= 1 || isNaN(ml) || isNaN(rl)) {
+    if (tipoCuota === "americana") {
+      ml = convertirAmericanaADecimal(ml);
+      rl = convertirAmericanaADecimal(rl);
+    }
+
+    if (!ml || !rl || ml <= 1 || rl <= 1 || isNaN(ml) || isNaN(rl)) {
       resultado.innerHTML = "Por favor, ingresa cuotas válidas.";
       return;
     }
@@ -219,8 +241,8 @@
       y = x * (ml - 1);
       total = x + y;
       resultado.innerHTML = `
-        Apuesta a <strong>ML @${ml}:</strong> $${x.toFixed(2)}<br>
-        Apuesta a <strong>RL -1.5 @${rl}:</strong> $${y.toFixed(2)}<br>
+        Apuesta a <strong>ML:</strong> $${x.toFixed(2)}<br>
+        Apuesta a <strong>RL -1.5:</strong> $${y.toFixed(2)}<br>
         <strong>Total apostado:</strong> $${total.toFixed(2)}<br><br>
         <strong>Escenarios:</strong><br>
         - Si <strong>gana por 1 carrera</strong> → Push<br>
@@ -239,8 +261,8 @@
       const ganancia2 = (x * ml + y * rl) - inversion;
 
       resultado.innerHTML = `
-        Apuesta a <strong>ML @${ml}:</strong> $${x.toFixed(2)}<br>
-        Apuesta a <strong>RL -1.5 @${rl}:</strong> $${y.toFixed(2)}<br>
+        Apuesta a <strong>ML:</strong> $${x.toFixed(2)}<br>
+        Apuesta a <strong>RL -1.5:</strong> $${y.toFixed(2)}<br>
         <strong>Total apostado:</strong> $${inversion.toFixed(2)}<br><br>
         <strong>Escenarios:</strong><br>
         - Si <strong>gana por 1 carrera</strong> → Recuperas inversión<br>
@@ -251,18 +273,23 @@
   }
 
   function calcularSimple() {
-    const cuota = parseFloat(document.getElementById("cuotaSimple").value);
+    let cuota = parseFloat(document.getElementById("cuotaSimple").value);
+    const tipoCuota = document.getElementById("tipoCuotaSimple").value;
     const ganancia = parseFloat(document.getElementById("gananciaSimple").value);
     const resultado = document.getElementById("resultadoSimple");
 
-    if (cuota <= 1 || ganancia <= 0 || isNaN(cuota) || isNaN(ganancia)) {
+    if (tipoCuota === "americana") {
+      cuota = convertirAmericanaADecimal(cuota);
+    }
+
+    if (!cuota || cuota <= 1 || ganancia <= 0 || isNaN(cuota) || isNaN(ganancia)) {
       resultado.innerHTML = "Ingresa una cuota válida y una ganancia deseada.";
       return;
     }
 
     const apuesta = ganancia / (cuota - 1);
     resultado.innerHTML = `
-      Para ganar $${ganancia.toFixed(2)} con cuota ${cuota},<br>
+      Para ganar $${ganancia.toFixed(2)} con cuota ${cuota.toFixed(2)},<br>
       debes apostar <strong>$${apuesta.toFixed(2)}</strong>.
     `;
   }
