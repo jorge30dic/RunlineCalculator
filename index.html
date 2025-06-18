@@ -1,16 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Calculadora Handicap -1</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-    rel="stylesheet"
-  />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
   <style>
     body {
-      font-family: "Segoe UI", sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       background-color: #f0f2f5;
       margin: 0;
       padding: 20px;
@@ -95,7 +92,6 @@
       display: block;
       font-weight: normal;
       margin-bottom: 5px;
-      cursor: pointer;
     }
     button {
       width: 100%;
@@ -121,297 +117,183 @@
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>Calculadora de Apuestas</h2>
 
-    <div class="tabs">
-      <button class="tab active" onclick="mostrarTab(0)">
-        <i class="fas fa-baseball-ball"></i> Simular Handicap -1
-      </button>
-      <button class="tab" onclick="mostrarTab(1)">
-        <i class="fas fa-calculator"></i> Apuesta Simple
-      </button>
-    </div>
+<div class="container">
+  <h2>Calculadora de Apuestas</h2>
 
-    <!-- Tab 1 -->
-    <div class="tab-content active">
-      <label for="tipoCuota">Tipo de cuota:</label>
-      <select id="tipoCuota">
-        <option value="decimal" selected>Decimal (Ej: 1.80)</option>
-        <option value="americana">Americana (Ej: -120 / +150)</option>
-      </select>
-
-      <label for="ml">Cuota Moneyline (ML):</label>
-      <input
-        type="number"
-        id="ml"
-        step="0.01"
-        placeholder="Ej: 1.50"
-      />
-
-      <label for="rl">Cuota Run Line -1.5:</label>
-      <input
-        type="number"
-        id="rl"
-        step="0.01"
-        placeholder="Ej: 2.20"
-      />
-
-      <div class="radio-group">
-        <label
-          ><input
-            type="radio"
-            name="modo"
-            value="ganancia"
-            checked
-            onchange="cambiarModo()"
-          />
-          Ganar una cantidad específica</label
-        >
-        <label
-          ><input
-            type="radio"
-            name="modo"
-            value="inversion"
-            onchange="cambiarModo()"
-          />
-          Apostar un monto específico</label
-        >
-      </div>
-
-      <div id="campoGanancia">
-        <label for="ganancia">Ganancia deseada ($):</label>
-        <input
-          type="number"
-          id="ganancia"
-          step="0.01"
-          placeholder="Ej: 100"
-        />
-      </div>
-
-      <div id="campoInversion" style="display: none;">
-        <label for="inversion">Monto total a apostar ($):</label>
-        <input
-          type="number"
-          id="inversion"
-          step="0.01"
-          placeholder="Ej: 100"
-        />
-      </div>
-
-      <button onclick="calcular()">Calcular</button>
-
-      <div class="result" id="resultado"></div>
-    </div>
-
-    <!-- Tab 2 -->
-    <div class="tab-content">
-      <label for="tipoCuotaSimple">Tipo de cuota:</label>
-      <select id="tipoCuotaSimple">
-        <option value="decimal" selected>Decimal</option>
-        <option value="americana">Americana</option>
-      </select>
-
-      <label for="cuotaSimple">Cuota:</label>
-      <input
-        type="number"
-        id="cuotaSimple"
-        step="0.01"
-        placeholder="Ej: 1.85"
-      />
-
-      <div class="radio-group">
-        <label
-          ><input
-            type="radio"
-            name="modoSimple"
-            value="ganancia"
-            checked
-            onchange="cambiarModoSimple()"
-          />
-          Ganancia deseada</label
-        >
-        <label
-          ><input
-            type="radio"
-            name="modoSimple"
-            value="inversion"
-            onchange="cambiarModoSimple()"
-          />
-          Monto a apostar</label
-        >
-      </div>
-
-      <div id="campoGananciaSimple">
-        <label for="gananciaSimple">Ganancia deseada ($):</label>
-        <input
-          type="number"
-          id="gananciaSimple"
-          step="0.01"
-          placeholder="Ej: 100"
-        />
-      </div>
-
-      <div id="campoInversionSimple" style="display: none;">
-        <label for="inversionSimple">Monto total a apostar ($):</label>
-        <input
-          type="number"
-          id="inversionSimple"
-          step="0.01"
-          placeholder="Ej: 100"
-        />
-      </div>
-
-      <button onclick="calcularSimple()">Calcular</button>
-
-      <div class="result" id="resultadoSimple"></div>
-    </div>
+  <div class="tabs">
+    <button class="tab active" onclick="mostrarTab(0)">
+      <i class="fas fa-baseball-ball"></i> Simular Handicap -1
+    </button>
+    <button class="tab" onclick="mostrarTab(1)">
+      <i class="fas fa-calculator"></i> Apuesta Simple
+    </button>
   </div>
 
-  <script>
-    function mostrarTab(index) {
-      const tabs = document.querySelectorAll(".tab");
-      const contents = document.querySelectorAll(".tab-content");
-      tabs.forEach((tab, i) => {
-        tab.classList.toggle("active", i === index);
-        contents[i].classList.remove("active");
-        setTimeout(() => contents[i].classList.toggle("active", i === index), 10);
-      });
+  <!-- Tab 1 -->
+  <div class="tab-content active">
+    <label for="tipoCuota">Tipo de cuota:</label>
+    <select id="tipoCuota">
+      <option value="decimal" selected>Decimal (Ej: 1.80)</option>
+      <option value="americana">Americana (Ej: -120 / +150)</option>
+    </select>
+
+    <label for="ml">Cuota Moneyline (ML):</label>
+    <input type="number" id="ml" step="0.01" placeholder="Ej: 1.50">
+
+    <label for="rl">Cuota Run Line -1.5:</label>
+    <input type="number" id="rl" step="0.01" placeholder="Ej: 2.20">
+
+    <div class="radio-group">
+      <label><input type="radio" name="modo" value="ganancia" checked onchange="cambiarModo()"> Ganar una cantidad específica</label>
+      <label><input type="radio" name="modo" value="inversion" onchange="cambiarModo()"> Apostar un monto específico</label>
+    </div>
+
+    <div id="campoGanancia">
+      <label for="ganancia">Ganancia deseada ($):</label>
+      <input type="number" id="ganancia" step="0.01" placeholder="Ej: 100">
+    </div>
+
+    <div id="campoInversion" style="display: none;">
+      <label for="inversion">Monto total a apostar ($):</label>
+      <input type="number" id="inversion" step="0.01" placeholder="Ej: 100">
+    </div>
+
+    <button onclick="calcular()">Calcular</button>
+
+    <div class="result" id="resultado"></div>
+  </div>
+
+  <!-- Tab 2 -->
+  <div class="tab-content">
+    <label for="tipoCuotaSimple">Tipo de cuota:</label>
+    <select id="tipoCuotaSimple">
+      <option value="decimal" selected>Decimal</option>
+      <option value="americana">Americana</option>
+    </select>
+
+    <label for="cuotaSimple">Cuota:</label>
+    <input type="number" id="cuotaSimple" step="0.01" placeholder="Ej: 1.85">
+
+    <label for="gananciaSimple">Ganancia deseada ($):</label>
+    <input type="number" id="gananciaSimple" step="0.01" placeholder="Ej: 100">
+
+    <button onclick="calcularSimple()">Calcular apuesta necesaria</button>
+
+    <div class="result" id="resultadoSimple"></div>
+  </div>
+</div>
+
+<script>
+  function mostrarTab(index) {
+    const tabs = document.querySelectorAll('.tab');
+    const contents = document.querySelectorAll('.tab-content');
+    tabs.forEach((tab, i) => {
+      tab.classList.toggle('active', i === index);
+      contents[i].classList.remove('active');
+      setTimeout(() => contents[i].classList.toggle('active', i === index), 10);
+    });
+  }
+
+  function cambiarModo() {
+    const modo = document.querySelector('input[name="modo"]:checked').value;
+    document.getElementById("campoGanancia").style.display = modo === "ganancia" ? "block" : "none";
+    document.getElementById("campoInversion").style.display = modo === "inversion" ? "block" : "none";
+    document.getElementById("resultado").innerHTML = "";
+  }
+
+  function convertirAmericanaADecimal(cuota) {
+    if (cuota >= 100) {
+      return (cuota / 100) + 1;
+    } else if (cuota <= -100) {
+      return (100 / Math.abs(cuota)) + 1;
+    } else {
+      return null;
+    }
+  }
+
+  function calcular() {
+    let ml = parseFloat(document.getElementById("ml").value);
+    let rl = parseFloat(document.getElementById("rl").value);
+    const tipoCuota = document.getElementById("tipoCuota").value;
+    const modo = document.querySelector('input[name="modo"]:checked').value;
+    const resultado = document.getElementById("resultado");
+
+    if (tipoCuota === "americana") {
+      ml = convertirAmericanaADecimal(ml);
+      rl = convertirAmericanaADecimal(rl);
     }
 
-    // Pestaña 1: Simular Handicap -1
-    function cambiarModo() {
-      const modo = document.querySelector('input[name="modo"]:checked').value;
-      document.getElementById("campoGanancia").style.display =
-        modo === "ganancia" ? "block" : "none";
-      document.getElementById("campoInversion").style.display =
-        modo === "inversion" ? "block" : "none";
-      document.getElementById("resultado").innerHTML = "";
+    if (!ml || !rl || ml <= 1 || rl <= 1 || isNaN(ml) || isNaN(rl)) {
+      resultado.innerHTML = "Por favor, ingresa cuotas válidas.";
+      return;
     }
 
-    function convertirAmericanaADecimal(cuota) {
-      if (cuota >= 100) {
-        return cuota / 100 + 1;
-      } else if (cuota <= -100) {
-        return 100 / Math.abs(cuota) + 1;
-      } else {
-        return null;
-      }
-    }
+    let x, y, total, ganancia;
 
-    function calcular() {
-      let ml = parseFloat(document.getElementById("ml").value);
-      let rl = parseFloat(document.getElementById("rl").value);
-      const tipoCuota = document.getElementById("tipoCuota").value;
-      const modo = document.querySelector('input[name="modo"]:checked').value;
-      const resultado = document.getElementById("resultado");
-
-      if (tipoCuota === "americana") {
-        ml = convertirAmericanaADecimal(ml);
-        rl = convertirAmericanaADecimal(rl);
-      }
-
-      if (!ml || !rl || ml <= 1 || rl <= 1 || isNaN(ml) || isNaN(rl)) {
-        resultado.innerHTML = "Por favor, ingresa cuotas válidas.";
+    if (modo === "ganancia") {
+      ganancia = parseFloat(document.getElementById("ganancia").value);
+      if (ganancia <= 0 || isNaN(ganancia)) {
+        resultado.innerHTML = "Por favor, ingresa una ganancia válida.";
         return;
       }
-
-      let x, y, total, ganancia;
-
-      if (modo === "ganancia") {
-        ganancia = parseFloat(document.getElementById("ganancia").value);
-        if (ganancia <= 0 || isNaN(ganancia)) {
-          resultado.innerHTML = "Por favor, ingresa una ganancia válida.";
-          return;
-        }
-        x = ganancia / ((ml - 1) * rl);
-        y = x * (ml - 1);
-        total = x + y;
-        resultado.innerHTML = `
-          Apuesta a <strong>ML:</strong> $${x.toFixed(2)}<br>
-          Apuesta a <strong>RL -1.5:</strong> $${y.toFixed(2)}<br>
-          <strong>Total apostado:</strong> $${total.toFixed(2)}<br><br>
-          <strong>Escenarios:</strong><br>
-          - Si <strong>gana por 1 carrera</strong> → Push<br>
-          - Si <strong>gana por 2+ carreras</strong> → Ganas $${ganancia.toFixed(
-            2
-          )}<br>
-          - Si <strong>pierde</strong> → Pierdes todo
-        `;
-      } else {
-        const inversion = parseFloat(document.getElementById("inversion").value);
-        if (inversion <= 0 || isNaN(inversion)) {
-          resultado.innerHTML = "Por favor, ingresa una inversión válida.";
-          return;
-        }
-        const proporcion = (ml - 1) / (ml - 1 + rl);
-        y = inversion * proporcion;
-        x = inversion - y;
-        const ganancia2 = x * ml + y * rl - inversion;
-
-        resultado.innerHTML = `
-          Apuesta a <strong>ML:</strong> $${x.toFixed(2)}<br>
-          Apuesta a <strong>RL -1.5:</strong> $${y.toFixed(2)}<br>
-          <strong>Total apostado:</strong> $${inversion.toFixed(2)}<br><br>
-          <strong>Escenarios:</strong><br>
-          - Si <strong>gana por 1 carrera</strong> → Recuperas inversión<br>
-          - Si <strong>gana por 2+ carreras</strong> → Ganas aprox: $${ganancia2.toFixed(
-            2
-          )}<br>
-          - Si <strong>pierde</strong> → Pierdes todo
-        `;
-      }
-    }
-
-    // Pestaña 2: Apuesta Simple con modo ganancia o inversion
-    function cambiarModoSimple() {
-      const modo = document.querySelector('input[name="modoSimple"]:checked').value;
-      document.getElementById("campoGananciaSimple").style.display =
-        modo === "ganancia" ? "block" : "none";
-      document.getElementById("campoInversionSimple").style.display =
-        modo === "inversion" ? "block" : "none";
-      document.getElementById("resultadoSimple").innerHTML = "";
-    }
-
-    function calcularSimple() {
-      let cuota = parseFloat(document.getElementById("cuotaSimple").value);
-      const tipoCuota = document.getElementById("tipoCuotaSimple").value;
-      const modo = document.querySelector('input[name="modoSimple"]:checked').value;
-      const resultado = document.getElementById("resultadoSimple");
-
-      if (tipoCuota === "americana") {
-        cuota = convertirAmericanaADecimal(cuota);
-      }
-
-      if (!cuota || cuota <= 1 || isNaN(cuota)) {
-        resultado.innerHTML = "Ingresa una cuota válida.";
+      x = ganancia / ((ml - 1) * rl);
+      y = x * (ml - 1);
+      total = x + y;
+      resultado.innerHTML = `
+        Apuesta a <strong>ML:</strong> $${x.toFixed(2)}<br>
+        Apuesta a <strong>RL -1.5:</strong> $${y.toFixed(2)}<br>
+        <strong>Total apostado:</strong> $${total.toFixed(2)}<br><br>
+        <strong>Escenarios:</strong><br>
+        - Si <strong>gana por 1 carrera</strong> → Push<br>
+        - Si <strong>gana por 2+ carreras</strong> → Ganas $${ganancia.toFixed(2)}<br>
+        - Si <strong>pierde</strong> → Pierdes todo
+      `;
+    } else {
+      const inversion = parseFloat(document.getElementById("inversion").value);
+      if (inversion <= 0 || isNaN(inversion)) {
+        resultado.innerHTML = "Por favor, ingresa una inversión válida.";
         return;
       }
+      const proporción = (ml - 1) / ((ml - 1) + rl);
+      y = inversion * proporción;
+      x = inversion - y;
+      const ganancia2 = (x * ml + y * rl) - inversion;
 
-      if (modo === "ganancia") {
-        const ganancia = parseFloat(document.getElementById("gananciaSimple").value);
-        if (!ganancia || ganancia <= 0 || isNaN(ganancia)) {
-          resultado.innerHTML = "Ingresa una ganancia válida.";
-          return;
-        }
-        const apuesta = ganancia / (cuota - 1);
-        resultado.innerHTML = `
-          Para ganar $${ganancia.toFixed(2)} con cuota ${cuota.toFixed(2)},<br>
-          debes apostar <strong>$${apuesta.toFixed(2)}</strong>.
-        `;
-      } else {
-        const inversion = parseFloat(document.getElementById("inversionSimple").value);
-        if (!inversion || inversion <= 0 || isNaN(inversion)) {
-          resultado.innerHTML = "Ingresa un monto a apostar válido.";
-          return;
-        }
-        const ganancia = inversion * (cuota - 1);
-        resultado.innerHTML = `
-          Apostando $${inversion.toFixed(2)} con cuota ${cuota.toFixed(2)},<br>
-          la ganancia será aproximadamente <strong>$${ganancia.toFixed(2)}</strong>.
-        `;
-      }
+      resultado.innerHTML = `
+        Apuesta a <strong>ML:</strong> $${x.toFixed(2)}<br>
+        Apuesta a <strong>RL -1.5:</strong> $${y.toFixed(2)}<br>
+        <strong>Total apostado:</strong> $${inversion.toFixed(2)}<br><br>
+        <strong>Escenarios:</strong><br>
+        - Si <strong>gana por 1 carrera</strong> → Recuperas inversión<br>
+        - Si <strong>gana por 2+ carreras</strong> → Ganas aprox: $${ganancia2.toFixed(2)}<br>
+        - Si <strong>pierde</strong> → Pierdes todo
+      `;
     }
-  </script>
+  }
+
+  function calcularSimple() {
+    let cuota = parseFloat(document.getElementById("cuotaSimple").value);
+    const tipoCuota = document.getElementById("tipoCuotaSimple").value;
+    const ganancia = parseFloat(document.getElementById("gananciaSimple").value);
+    const resultado = document.getElementById("resultadoSimple");
+
+    if (tipoCuota === "americana") {
+      cuota = convertirAmericanaADecimal(cuota);
+    }
+
+    if (!cuota || cuota <= 1 || ganancia <= 0 || isNaN(cuota) || isNaN(ganancia)) {
+      resultado.innerHTML = "Ingresa una cuota válida y una ganancia deseada.";
+      return;
+    }
+
+    const apuesta = ganancia / (cuota - 1);
+    resultado.innerHTML = `
+      Para ganar $${ganancia.toFixed(2)} con cuota ${cuota.toFixed(2)},<br>
+      debes apostar <strong>$${apuesta.toFixed(2)}</strong>.
+    `;
+  }
+</script>
+
 </body>
 </html>
