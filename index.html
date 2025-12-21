@@ -206,25 +206,17 @@
       <div class="result" id="resultadoSimple"></div>
     </div>
 
-    <!-- Tab 3: Convertidor de cuotas -->
+        <!-- Tab 3: Convertidor de cuotas -->
     <div class="tab-content">
-      <label for="cuotaConvertir">Introduce la cuota a convertir:</label>
+      <label for="cuotaConvertir">Introduce la cuota (decimal o americana):</label>
       <input
         type="number"
         id="cuotaConvertir"
         step="0.01"
-        placeholder="Ej: 1.85 o -150"
+        placeholder="Ej: 1.85 o -150 o +150"
       />
 
-      <label for="tipoCuotaConvertir">Tipo de cuota ingresada:</label>
-      <select id="tipoCuotaConvertir">
-        <option value="decimal" selected>Decimal</option>
-        <option value="americana">Americana</option>
-      </select>
-
-      <button onclick="convertirCuota()">Convertir</button>
-
-      <div class="result" id="resultadoConvertidor"></div>
+      <div class="result" id="resultadoConvertidor">Escribe una cuota para ver la conversión en vivo.</div>
     </div>
   </div>
 
@@ -240,7 +232,7 @@
       // Limpiar resultados al cambiar tab
       document.getElementById("resultado").innerHTML = "";
       document.getElementById("resultadoSimple").innerHTML = "";
-      document.getElementById("resultadoConvertidor").innerHTML = "";
+      document.getElementById("resultadoConvertidor").innerHTML = "Escribe una cuota para ver la conversión en vivo.";
     }
 
     function cambiarModo() {
@@ -360,44 +352,70 @@
     `;
     }
 
-    function convertirCuota() {
+    function detectarTipoCuota(valor) {
+      // Regla práctica:
+      // - Americana válida suele ser |valor| >= 100
+      // - Decimal válida suele ser > 1
+      if (Math.abs(valor) >= 100) return "americana";
+      if (valor > 1) return "decimal";
+      return "invalida";
+    }
+
+    function convertirCuotaEnVivo() {
       const cuotaInput = parseFloat(document.getElementById("cuotaConvertir").value);
-      const tipo = document.getElementById("tipoCuotaConvertir").value;
       const resultado = document.getElementById("resultadoConvertidor");
 
       if (isNaN(cuotaInput)) {
-        resultado.innerHTML = "Por favor, ingresa una cuota válida.";
+        resultado.innerHTML = "Escribe una cuota para ver la conversión en vivo.";
         return;
       }
 
-      if (tipo === "americana") {
-        // Convertir americana a decimal
+      const tipoDetectado = detectarTipoCuota(cuotaInput);
+
+      if (tipoDetectado === "americana") {
         const decimal = convertirAmericanaADecimal(cuotaInput);
         if (!decimal) {
           resultado.innerHTML = "Cuota americana inválida. Debe ser >= +100 o <= -100.";
           return;
         }
+
         resultado.innerHTML = `
+          <strong>Detectado:</strong> Americana<br>
           Cuota americana: <strong>${cuotaInput > 0 ? "+" : ""}${cuotaInput}</strong><br>
           Cuota decimal equivalente: <strong>${decimal.toFixed(2)}</strong>
         `;
-      } else {
-        // Convertir decimal a americana
-        if (cuotaInput < 1) {
-          resultado.innerHTML = "Cuota decimal inválida. Debe ser >= 1.";
+        return;
+      }
+
+      if (tipoDetectado === "decimal") {
+        if (cuotaInput <= 1) {
+          resultado.innerHTML = "Cuota decimal inválida. Debe ser > 1.";
           return;
         }
+
         const americana = convertirDecimalAAmericana(cuotaInput);
         if (!americana) {
           resultado.innerHTML = "No se puede convertir esta cuota decimal.";
           return;
         }
+
         resultado.innerHTML = `
+          <strong>Detectado:</strong> Decimal<br>
           Cuota decimal: <strong>${cuotaInput.toFixed(2)}</strong><br>
           Cuota americana equivalente: <strong>${americana}</strong>
         `;
+        return;
       }
+
+      resultado.innerHTML = "Cuota inválida. Decimal debe ser > 1. Americana debe ser >= +100 o <= -100.";
     }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const input = document.getElementById("cuotaConvertir");
+      if (input) {
+        input.addEventListener("input", convertirCuotaEnVivo);
+      }
+    });
   </script>
 </body>
 </html>
