@@ -233,10 +233,14 @@
   </select>
 
   <label for="sportiumCuota">Cuota:</label>
-  <input type="number" id="sportiumCuota" step="0.01" placeholder="Ej: 1.91 o -110" />
+  <input type="text" id="sportiumCuota" inputmode="decimal" placeholder="Ej: 1.91" />
 
   <label for="sportiumComision">Comisión de retiro (% sobre el total retirado):</label>
   <input type="number" id="sportiumComision" step="0.01" value="5.5" placeholder="Ej: 5.5" />
+  <div style="margin-top:6px; display:flex; align-items:center; gap:8px;">
+    <input type="checkbox" id="sportiumComisionFija" checked onchange="toggleComisionSportium()">
+    <label for="sportiumComisionFija" style="margin:0;">Comisión fija (5.5%)</label>
+  </div>
 
   <label for="sportiumGanancia">Ganancia neta deseada ($) (después de comisión):</label>
   <input type="number" id="sportiumGanancia" step="0.01" placeholder="Ej: 200" />
@@ -382,20 +386,56 @@
     }
 
     
+
+function actualizarSportiumUI() {
+  const tipo = document.getElementById("sportiumTipoCuota").value;
+  const cuotaInput = document.getElementById("sportiumCuota");
+
+  if (tipo === "americana") {
+    cuotaInput.placeholder = "Ej: -120 o +150";
+    cuotaInput.inputMode = "numeric";
+  } else {
+    cuotaInput.placeholder = "Ej: 1.91";
+    cuotaInput.inputMode = "decimal";
+  }
+}
+
+function toggleComisionSportium() {
+  const chk = document.getElementById("sportiumComisionFija");
+  const inp = document.getElementById("sportiumComision");
+  if (chk.checked) {
+    inp.value = "5.5";
+    inp.disabled = true;
+    inp.style.opacity = "0.7";
+  } else {
+    inp.disabled = false;
+    inp.style.opacity = "1";
+    inp.focus();
+    inp.select();
+  }
+}
+
 function calcularSportium() {
-  let cuota = parseFloat(document.getElementById("sportiumCuota").value);
   const tipoCuota = document.getElementById("sportiumTipoCuota").value;
-  const comisionPct = parseFloat(document.getElementById("sportiumComision").value);
+  const cuotaRaw = (document.getElementById("sportiumCuota").value || "").trim();
+  let cuota;
+  if (tipoCuota === "americana") {
+    // Permite formatos como +150, 150, -120
+    const am = parseInt(cuotaRaw.replace(/^\+/, ""), 10);
+    cuota = convertirAmericanaADecimal(am);
+  } else {
+    cuota = parseFloat(cuotaRaw.replace(",", "."));
+  }
+
+  const comisionInput = document.getElementById("sportiumComision");
+  const fija = document.getElementById("sportiumComisionFija").checked;
+  const comisionPct = fija ? 5.5 : parseFloat(comisionInput.value);
   const gananciaNetaDeseada = parseFloat(document.getElementById("sportiumGanancia").value);
   const resultado = document.getElementById("resultadoSportium");
 
   if (isNaN(cuota) || isNaN(comisionPct) || isNaN(gananciaNetaDeseada)) {
     resultado.innerHTML = "Por favor, completa todos los campos con valores válidos.";
     return;
-  }
-
-  if (tipoCuota === "americana") {
-    cuota = convertirAmericanaADecimal(cuota);
   }
 
   if (!cuota || cuota <= 1 || isNaN(cuota)) {
@@ -505,6 +545,16 @@ function detectarTipoCuota(valor) {
       const input = document.getElementById("cuotaConvertir");
       if (input) {
         input.addEventListener("input", convertirCuotaEnVivo);
+      }
+
+      // Sportium: UI dinámica y comisión fija por defecto
+      const tipo = document.getElementById("sportiumTipoCuota");
+      if (tipo) {
+        tipo.addEventListener("change", actualizarSportiumUI);
+        actualizarSportiumUI();
+      }
+      if (document.getElementById("sportiumComisionFija")) {
+        toggleComisionSportium();
       }
     });
   </script>
