@@ -133,7 +133,11 @@
       <button class="tab" onclick="mostrarTab(2)">
         <i class="fas fa-exchange-alt"></i> Convertidor Cuotas
       </button>
-    </div>
+    
+
+<button class="tab" onclick="mostrarTab(3)">
+  <i class="fas fa-receipt"></i> Sportium
+</button></div>
 
     <!-- Tab 1 -->
     <div class="tab-content active">
@@ -218,6 +222,29 @@
 
       <div class="result" id="resultadoConvertidor">Escribe una cuota para ver la conversión en vivo.</div>
     </div>
+
+
+<!-- Tab 4: Sportium (comisión al retiro) -->
+<div class="tab-content">
+  <label for="sportiumTipoCuota">Tipo de cuota:</label>
+  <select id="sportiumTipoCuota">
+    <option value="decimal" selected>Decimal (Ej: 1.91)</option>
+    <option value="americana">Americana (Ej: -120 / +150)</option>
+  </select>
+
+  <label for="sportiumCuota">Cuota:</label>
+  <input type="number" id="sportiumCuota" step="0.01" placeholder="Ej: 1.91 o -110" />
+
+  <label for="sportiumComision">Comisión de retiro (% sobre el total retirado):</label>
+  <input type="number" id="sportiumComision" step="0.01" value="5.5" placeholder="Ej: 5.5" />
+
+  <label for="sportiumGanancia">Ganancia neta deseada ($) (después de comisión):</label>
+  <input type="number" id="sportiumGanancia" step="0.01" placeholder="Ej: 200" />
+
+  <button onclick="calcularSportium()">Calcular apuesta necesaria</button>
+
+  <div class="result" id="resultadoSportium"></div>
+</div>
   </div>
 
   <script>
@@ -233,6 +260,8 @@
       document.getElementById("resultado").innerHTML = "";
       document.getElementById("resultadoSimple").innerHTML = "";
       document.getElementById("resultadoConvertidor").innerHTML = "Escribe una cuota para ver la conversión en vivo.";
+      const sportiumRes = document.getElementById("resultadoSportium");
+      if (sportiumRes) sportiumRes.innerHTML = "";
     }
 
     function cambiarModo() {
@@ -352,7 +381,69 @@
     `;
     }
 
-    function detectarTipoCuota(valor) {
+    
+function calcularSportium() {
+  let cuota = parseFloat(document.getElementById("sportiumCuota").value);
+  const tipoCuota = document.getElementById("sportiumTipoCuota").value;
+  const comisionPct = parseFloat(document.getElementById("sportiumComision").value);
+  const gananciaNetaDeseada = parseFloat(document.getElementById("sportiumGanancia").value);
+  const resultado = document.getElementById("resultadoSportium");
+
+  if (isNaN(cuota) || isNaN(comisionPct) || isNaN(gananciaNetaDeseada)) {
+    resultado.innerHTML = "Por favor, completa todos los campos con valores válidos.";
+    return;
+  }
+
+  if (tipoCuota === "americana") {
+    cuota = convertirAmericanaADecimal(cuota);
+  }
+
+  if (!cuota || cuota <= 1 || isNaN(cuota)) {
+    resultado.innerHTML = "Cuota inválida. Decimal debe ser > 1. Americana debe ser >= +100 o <= -100.";
+    return;
+  }
+
+  if (comisionPct < 0 || comisionPct >= 100) {
+    resultado.innerHTML = "Comisión inválida. Debe estar entre 0 y 99.99.";
+    return;
+  }
+
+  if (gananciaNetaDeseada <= 0) {
+    resultado.innerHTML = "Ganancia neta inválida. Debe ser mayor que 0.";
+    return;
+  }
+
+  const f = comisionPct / 100;
+  const factorRecibido = 1 - f;
+
+  const denom = (cuota * factorRecibido) - 1;
+
+  if (denom <= 0) {
+    resultado.innerHTML = "Con esa cuota y comisión, no es posible obtener ganancia neta (cuota efectiva ≤ 1).";
+    return;
+  }
+
+  const apuesta = gananciaNetaDeseada / denom;
+  const retiroBruto = apuesta * cuota;
+  const comision = retiroBruto * f;
+  const retiroNeto = retiroBruto - comision;
+  const gananciaNetaReal = retiroNeto - apuesta;
+
+  const americanaEquiv = convertirDecimalAAmericana(cuota);
+
+  resultado.innerHTML = `
+    <strong>Cuota (decimal):</strong> ${cuota.toFixed(4)}${americanaEquiv ? ` &nbsp; <strong>(americana):</strong> ${americanaEquiv}` : ""}<br>
+    <strong>Comisión:</strong> ${comisionPct.toFixed(2)}% (sobre el retiro total)<br><br>
+
+    <strong>Debes apostar:</strong> $${apuesta.toFixed(2)}<br>
+    <strong>Retiro bruto (si gana):</strong> $${retiroBruto.toFixed(2)}<br>
+    <strong>Comisión cobrada:</strong> $${comision.toFixed(2)}<br>
+    <strong>Retiro neto:</strong> $${retiroNeto.toFixed(2)}<br>
+    <strong>Ganancia neta final:</strong> $${gananciaNetaReal.toFixed(2)}
+  `;
+}
+
+function detectarTipoCuota(valor) {
       // Regla práctica:
       // - Americana válida suele ser |valor| >= 100
       // - Decimal válida suele ser > 1
